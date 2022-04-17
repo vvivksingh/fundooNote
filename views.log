@@ -1,0 +1,5 @@
+WARNING:django.request:Not Found: /note/notes/
+WARNING:django.request:Not Found: /note/notes/
+WARNING:django.request:Not Found: /note/note
+WARNING:django.request:Bad Request: /note/notes
+INFO:django.utils.autoreload:C:\Users\vivks\OneDrive\Desktop\FundooNotes\fundooNotes\user\views.py changed, reloading.
