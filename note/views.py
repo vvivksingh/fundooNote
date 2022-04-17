@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from .models import Note
 from .serializers import NotesSerializer
 
+from .utils import verify_token
+
 
 logging.basicConfig(filename="notes.log", filemode="w")
 
@@ -13,7 +15,7 @@ class Notes(APIView):
     """
     class based views for crud operation
     """
-
+    @verify_token
     def post(self, request):
         """
         this method is created for inserting the data
@@ -34,6 +36,7 @@ class Notes(APIView):
             logging.error(e)
             return Response({"message": "validation failed"}, status=status.HTTP_400_BAD_REQUEST)
 
+    @verify_token
     def get(self, request):
         """
         this method is created for retrieve data
@@ -57,6 +60,7 @@ class Notes(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
+    @verify_token
     def put(self, request):
         """
         To update a previous note
@@ -74,6 +78,7 @@ class Notes(APIView):
             return Response({"message": "Note Updation Failed", "error": "{}".format(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
+    @verify_token
     def delete(self, request):
         """
         this method is created for delete the note
