@@ -7,6 +7,8 @@ from .serializers import NotesSerializer
 
 from .utils import verify_token
 
+from .utils import RedisCache
+
 
 logging.basicConfig(filename="notes.log", filemode="w")
 
@@ -26,6 +28,8 @@ class Notes(APIView):
             serializer = NotesSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            RedisCache().add_note(serializer.data)
+
             return Response(
                 {
                     "message": "Notes created successfully",
@@ -46,6 +50,7 @@ class Notes(APIView):
         try:
             note = Note.objects.filter(user_id=request.data.get("user_id"))
             serializer = NotesSerializer(note, many=True)
+            RedisCache().get_note(id=request.data.get("id"))
             return Response(
                 {
                     "message": "Your Note's",
@@ -72,6 +77,7 @@ class Notes(APIView):
             serializer = NotesSerializer(note, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            RedisCache().update_note(request.data.get("user_id"), serializer.data)
             return Response({"Message": "Note Updated", "Data": serializer.data}, status=status.HTTP_201_CREATED)
         except Exception as e:
             logging.error(e)
@@ -88,6 +94,7 @@ class Notes(APIView):
         try:
             note = Note.objects.get(id=request.data.get("id"))
             note.delete()
+            RedisCache().delete_note(request.data.get("user_id"), request.data.get("id"))
             return Response(
                 {
                     "message": "Data deleted"
