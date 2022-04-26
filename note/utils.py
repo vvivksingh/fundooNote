@@ -27,60 +27,67 @@ def verify_token(function):
 
 
 class RedisCache:
-    def __init__(self):
-        self.cache_memory = RedisService()
+    # def __init__(self):
+    #     self.cache_memory = RedisService()
 
-    def add_note(self, note):
+    cache_mem = RedisService()
+
+    @classmethod
+    def add_note(cls, note):
 
         try:
-            user_id = note.get("user_id")
-            notes = self.get_note(user_id)
+            user_id = int(note.get("user_id"))
+            notes = {} if cls.get_note(user_id) is None else cls.get_note(user_id)
+            # if cls.get_note(user_id) is None:
+            #     notes = {}
+            # else:
+            #     notes = cls.get_note(user_id)
+
             note_id = note.get("id")
             notes.update({note_id: note})
-            self.cache_memory.set(user_id, json.dumps(notes))
+            cls.cache_mem.set(user_id, json.dumps(notes))
 
         except Exception as e:
             logging.error(e)
 
-    def get_note(self, note_id):
+    @classmethod
+    def get_note(cls, user_id):
         """
         getting notes from cache memory
         :param note:
         :return:
-        """
-        try:
-            return json.loads(self.cache_memory.get(note_id))
+            return json.loads(cls.cache_mem.get(user_id))
         except Exception as e:
             logging.error(e)
 
-    def update_note(self, user_id, updatednote):
+    @staticmethod
         """
-                for updating the note in cache
-                :param user_id: id of note
-                :param updatednote: note details
-                """
-        note_list = RedisService().get(user_id)
-        if note_list is None:
-            RedisService().redis_client.set(user_id, json.dumps([updatednote]))
-            return
-        for note in note_list:
-            if updatednote.get(id) == note.get(id):
-                note.update(updatednote)
-        else:
-            raise ObjectDoesNotExist
 
-    def delete_note(self, user_id, note_id):
+    @classmethod
+    def update_note(cls, updated_note):
+
+        try:
+            user_id = updated_note.get('user_id')
+            id = updated_note.get("id")
+            note_dict = json.loads(RedisService().get(user_id))
+            if note_dict.get(id):
+                note_dict.update({id: updated_note})
+                cls.cache_mem.set(user_id, json.dumps(note_dict))
+        except Exception as e:
+            logging.error(e)
+
+    @classmethod
+    def delete_note(cls, user_id, note_id):
         """
         deleting the note from cache
         :param user_id: user id of Note user
         :param note_id: id of the note
         :return:
         """
-        note_list = RedisService().redis_client.get(user_id)
-        if note_list is None:
-            raise ObjectDoesNotExist
-        for note in note_list:
-            if RedisService().redis_client.get(note_id) == note.get(id):
-                del note
+        note_dict = cls.cache_mem.get(user_id)
+        note_dict = json.loads(note_dict)
+        if note_dict is not None:
+            del note_dict[note_id]
+            cls.cache_mem.set(user_id, json.dumps(note_dict))
         else:
             raise ObjectDoesNotExist

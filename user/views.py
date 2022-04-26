@@ -1,6 +1,5 @@
 import logging
 
-from django.core.mail import send_mail
 from django.http import HttpResponse
 
 from .models import NotesUser
@@ -14,6 +13,8 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 
 from .utils import EncodeDecodeToken
+
+from .task import send_email
 
 logging.basicConfig(filename="views.log", filemode="w")
 
@@ -41,11 +42,7 @@ class UserRegistration(APIView):
                                                  age=serializer.data.get('age'))
 
             encoded_token = EncodeDecodeToken.encode_token(payload={"user_id": user.pk})
-            send_mail(from_email=settings.EMAIL_HOST, recipient_list=[serializer.data['email']],
-                      message="Thanks for using fundooNotes services\n Your activation token = "
-                              "http://127.0.0.1:8000/user/api/{}".format(
-                          encoded_token),
-                      subject="Link for Your Registration", fail_silently=False, )
+            send_email.delay(token=encoded_token, to_email=serializer.data.get('email'))
             return Response({
                 "message": "User Registered Successfully ",
                 "token": "{}".format(encoded_token)}, status=status.HTTP_201_CREATED)
