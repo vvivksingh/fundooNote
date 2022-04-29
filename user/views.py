@@ -16,14 +16,27 @@ from .utils import EncodeDecodeToken
 
 from .task import send_email
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
 logging.basicConfig(filename="views.log", filemode="w")
 
 
 class UserRegistration(APIView):
-    """
-    class based views for User registration
-    """
-
+    @swagger_auto_schema(
+        operation_summary="register",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='username'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='password'),
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='email'),
+                'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='first_name'),
+                'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='last_name'),
+                'mobile': openapi.Schema(type=openapi.TYPE_STRING, description='mobile'),
+                'age': openapi.Schema(type=openapi.TYPE_STRING, description='age'),
+            }
+        ))
     def post(self, request):
         """
         this method is created for inserting the data
@@ -51,6 +64,15 @@ class UserRegistration(APIView):
 
 
 class LoginView(APIView):
+    @swagger_auto_schema(
+        operation_summary="login",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='username'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='password'),
+            }
+        ))
     def post(self, request):
         """
         For login of user
