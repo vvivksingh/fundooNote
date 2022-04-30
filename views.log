@@ -2,3 +2,5 @@ ERROR:root:Note matching query does not exist.
 WARNING:django.request:Bad Request: /note/notes/
 ERROR:root:Note matching query does not exist.
 WARNING:django.request:Bad Request: /note/notes/
+ERROR:root:Note matching query does not exist.
+WARNING:django.request:Bad Request: /note/notes/
