@@ -12,7 +12,7 @@ def verify_token(function):
     this function is created for verifying user
     """
 
-    def wrapper(self, request):
+    def wrapper(self, request, *args, **kwargs):
         if 'HTTP_AUTHORIZATION' not in request.META:
             msg = Response({'message': 'Token not provided in the header'})
             msg.status_code = 400
@@ -21,7 +21,7 @@ def verify_token(function):
         user_id = EncodeDecodeToken.decode_token(token)
         request.data.update({'user_id': user_id.get("user_id")})
         request.data.update({'user_id': user_id.get("user_id")})
-        return function(self, request)
+        return function(self, request, *args, **kwargs)
 
     return wrapper
 

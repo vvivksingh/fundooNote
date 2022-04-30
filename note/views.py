@@ -77,11 +77,15 @@ class Notes(APIView):
         try:
             note = Note.objects.filter(user_id=request.data.get("user_id"))
             serializer = NotesSerializer(note, many=True)
-            RedisCache().get_note(user_id=request.data.get("user_id"))
+            redis_data = RedisCache.get_note(user_id=request.data.get("user_id"))
+            print(redis_data)
+            data_list = []
+            for key, value in redis_data.items():
+                data_list.append(value)
             return Response(
                 {
                     "message": "Your Note's",
-                    "data": serializer.data
+                    "data": redis_data
                 },
                 status=status.HTTP_201_CREATED)
         except Exception as e:
