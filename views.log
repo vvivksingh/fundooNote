@@ -1,2 +1,0 @@
-ERROR:root:'NoneType' object has no attribute 'items'
-WARNING:django.request:Bad Request: /note/notes/
