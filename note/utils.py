@@ -93,6 +93,7 @@ class RedisCache:
         """
         note_dict = cls.cache_mem.get(user_id)
         note_dict = json.loads(note_dict)
+        print(note_dict)
         if note_dict is not None:
             del note_dict[note_id]
             cls.cache_mem.set(user_id, json.dumps(note_dict))
