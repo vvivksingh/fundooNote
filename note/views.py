@@ -118,10 +118,12 @@ class Notes(APIView):
         :return:
         """
         try:
+            print(request.data)
             cursor.execute(
-                'UPDATE  note_note SET title = %s,description=%s,WHERE user_id_id=%s AND id=%s',
+                'UPDATE  note_note SET title = %s,description=%s WHERE user_id_id=%s AND id=%s',
                 [request.data.get('title'), request.data.get('description'), request.data.get('user_id'),
                  request.data.get('id')])
+            print("something")
 
             note = Note.objects.get(id=request.data.get("id"))
             serializer = NotesSerializer(note, data=request.data)
@@ -134,73 +136,46 @@ class Notes(APIView):
             return Response({"message": "Note Update Failed", "error": "{}".format(e)},
                             status=status.HTTP_400_BAD_REQUEST)
 
+
+class DeleteSpecific(APIView):
     @verify_token
-    @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter('TOKEN', openapi.IN_HEADER, type=openapi.TYPE_STRING)
-    ], operation_summary="delete note",
+    @swagger_auto_schema(
+        operation_summary="Delete",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="note_id"),
+                'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="id"),
             }
-        ))
+        ),
+    )
     def delete(self, request):
+
         """
-        this method is created for delete the note
-        :param request:
-        :return: response
+        this method is created for retrieve data
+        :param request: format of the request
+        :return: Response
         """
         try:
+            print("A")
             cursor.execute('DELETE FROM note_note WHERE id=%s', [request.data.get('id')])
-            # note = Note.objects.get(id=request.data.get("id"))
-            # note.delete()
-            # RedisCache.delete_note(request.data.get("user_id"), request.data.get("id"))
-            # RedisService().delete(user_id=request.data.get("user_id"),note_id=request.data.get("id"))
+            # note = Note.objects.filter(user_id=request.data.get("user_id"))
+            # serializer = NotesSerializer(note, many=True)
+            # redis_data = RedisCache.get_note(user_id=request.data.get("user_id"))
+
+            # specific_note = redis_data.get(str(pk))
+            # if specific_note is None:
+            #     return Response({"msg": "Data Not found"}, status=status.HTTP_404_NOT_FOUND)
+
             return Response(
                 {
-                    "message": "Data deleted"
+                    "message": "Notes deleted",
                 },
-                status=status.HTTP_204_NO_CONTENT)
+                status=status.HTTP_200_OK)
         except Exception as e:
+            print(e)
             logging.error(e)
             return Response(
                 {
-                    "message": "Unable to delete"
+                    "message": "Notes not deleted"
                 },
                 status=status.HTTP_400_BAD_REQUEST)
-
-
-# class GetSpecific(APIView):
-#     @verify_token
-#     @swagger_auto_schema(manual_parameters=[
-#         openapi.Parameter('Authorization', openapi.IN_HEADER, type=openapi.TYPE_STRING)
-#     ], operation_summary="get note by user_id")
-#     def get(self, request, pk=None):
-#
-#         """
-#         this method is created for retrieve data
-#         :param request: format of the request
-#         :return: Response
-#         """
-#         try:
-#             note = Note.objects.filter(user_id=request.data.get("user_id"))
-#             serializer = NotesSerializer(note, many=True)
-#             # redis_data = RedisCache.get_note(user_id=request.data.get("user_id"))
-#
-#             specific_note = redis_data.get(str(pk))
-#             if specific_note is None:
-#                 return Response({"msg": "Data Not found"}, status=status.HTTP_404_NOT_FOUND)
-#
-#             return Response(
-#                 {
-#                     "message": "Your Note's",
-#                     "data": specific_note
-#                 },
-#                 status=status.HTTP_200_OK)
-#         except Exception as e:
-#             logging.error(e)
-#             return Response(
-#                 {
-#                     "message": "No notes found"
-#                 },
-#                 status=status.HTTP_400_BAD_REQUEST)

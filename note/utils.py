@@ -21,7 +21,7 @@ def verify_token(function):
         token = request.META['HTTP_AUTHORIZATION']
         user_id = EncodeDecodeToken.decode_token(token)
         request.data.update({'user_id': user_id.get("user_id")})
-        request.data.update({'user_id': user_id.get("user_id")})
+        print(request.data)
         return function(self, request, *args, **kwargs)
 
     return wrapper
