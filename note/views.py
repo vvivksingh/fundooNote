@@ -66,23 +66,23 @@ class Notes(APIView):
         :return: Response
         """
         try:
-            # note_list = Note.objects.all()
+            note_list = Note.objects.all()
 
-            # note = Note.objects.filter(user_id=request.data.get("user_id"))
-            # serializer = NotesSerializer(note_list, many=True)
-            # print(serializer.data)
+            note = Note.objects.filter(user_id=request.data.get("user_id"))
+            serializer = NotesSerializer(note_list, many=True)
 
-            redis_data = RedisCache().get_note(user_id=request.data.get("user_id"))
-            list_data = []
-            # for key in redis_data:
-            #     list_data.append(redis_data.get(key))
-            for key, value in redis_data.items():
-                list_data.append(value)
+
+            # redis_data = RedisCache().get_note(user_id=request.data.get("user_id"))
+            # list_data = []
+            # # for key in redis_data:
+            # #     list_data.append(redis_data.get(key))
+            # for key, value in redis_data.items():
+            #     list_data.append(value)
 
             return Response(
                 {
                     "message": "Your Note's",
-                    "data": list_data
+                    "data": serializer.data
                 },
                 status=status.HTTP_200_OK)
         except Exception as e:
@@ -114,10 +114,9 @@ class Notes(APIView):
         try:
             note = Note.objects.get(id=request.data.get("id"))
             serializer = NotesSerializer(note, data=request.data)
-            print(serializer)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            RedisCache().update_note(serializer.data)
+            RedisCache.update_note(serializer.data)
             return Response({"Message": "Note Updated", "Data": serializer.data}, status=status.HTTP_201_CREATED)
         except Exception as e:
             logging.error(e)
@@ -141,15 +140,24 @@ class Notes(APIView):
         :return: response
         """
         try:
-            note = Note.objects.get(id=request.data.get("id"))
+            note_id = request.data.get("id")
+            user_id = request.data.get("user_id")
+            note = Note.objects.get(id=note_id)
+
+
+
+            list_notes = RedisCache.get_note(user_id)
+
+            if list_notes is not None and list_notes.get(note_id) is not None:
+
+                RedisCache.delete_note(user_id, note_id)
             note.delete()
-            RedisCache.delete_note(request.data.get("user_id"), request.data.get("id"))
-            # RedisService().delete(user_id=request.data.get("user_id"),note_id=request.data.get("id"))
             return Response(
                 {
                     "message": "Data deleted"
                 },
                 status=status.HTTP_204_NO_CONTENT)
+
         except Exception as e:
             logging.error(e)
             return Response(

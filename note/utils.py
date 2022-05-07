@@ -13,6 +13,7 @@ def verify_token(function):
     """
 
     def wrapper(self, request, *args, **kwargs):
+        print(request.META)
 
         if 'HTTP_AUTHORIZATION' not in request.META:
             msg = Response({'message': 'Token not provided in the header'})
@@ -21,15 +22,12 @@ def verify_token(function):
         token = request.META['HTTP_AUTHORIZATION']
         user_id = EncodeDecodeToken.decode_token(token)
         request.data.update({'user_id': user_id.get("user_id")})
-        request.data.update({'user_id': user_id.get("user_id")})
         return function(self, request, *args, **kwargs)
 
     return wrapper
 
 
 class RedisCache:
-    # def __init__(self):
-    #     self.cache_memory = RedisService()
 
     cache_mem = RedisService()
 
@@ -37,13 +35,8 @@ class RedisCache:
     def add_note(cls, note):
 
         try:
-            print(note)
             user_id = int(note.get("user_id"))
             notes = {} if cls.get_note(user_id) is None else cls.get_note(user_id)
-            # if cls.get_note(user_id) is None:
-            #     notes = {}
-            # else:
-            #     notes = cls.get_note(user_id)
 
             note_id = note.get("id")
 
@@ -72,11 +65,9 @@ class RedisCache:
     def update_note(cls, updated_note):
 
         try:
-            print(updated_note)
             user_id = updated_note.get('user_id')
             id = str(updated_note.get("id"))
             note_dict = json.loads(RedisService().get(user_id))
-            print(note_dict)
             if note_dict.get(id):
                 note_dict.update({id: updated_note})
                 cls.cache_mem.set(user_id, json.dumps(note_dict))

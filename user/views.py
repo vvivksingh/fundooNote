@@ -85,7 +85,7 @@ class LoginView(APIView):
             if user is not None:
                 token = EncodeDecodeToken.encode_token(payload={"user_id": user.pk})
                 return Response({"message": "Login Successfully!!", "token": "{}".format(token)},
-                                status=status.HTTP_201_CREATED)
+                                status=status.HTTP_200_OK)
 
             return Response({
                 "message": "login Failed"

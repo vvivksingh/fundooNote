@@ -30,8 +30,6 @@ class TestUser:
                                              first_name="Vivek",
                                              last_name="Singh",
                                              mobile="9039165805")
-        user.is_verified = True
-        user.save()
         login_data = {
             "username": "vivek",
             "password": "vivek123",
