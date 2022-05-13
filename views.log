@@ -1,0 +1,2 @@
+WARNING:django.request:Unauthorized: /note/notes/
+WARNING:django.request:Unauthorized: /note/notes/

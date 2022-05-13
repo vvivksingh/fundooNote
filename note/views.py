@@ -146,9 +146,10 @@ class Notes(APIView):
 
 
 
-            list_notes = RedisCache.get_note(user_id)
+            notes = RedisCache.get_note(user_id)
+            print(notes)
 
-            if list_notes is not None and list_notes.get(note_id) is not None:
+            if notes is not None and notes.get(note_id) is not None:
 
                 RedisCache.delete_note(user_id, note_id)
             note.delete()
