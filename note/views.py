@@ -24,7 +24,7 @@ class Notes(APIView):
 
     @verify_token
     @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter('TOKEN', openapi.IN_HEADER, type=openapi.TYPE_STRING)
+        openapi.Parameter('Authorization', openapi.IN_HEADER, type=openapi.TYPE_STRING)
     ], operation_summary="Add notes",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -91,7 +91,7 @@ class Notes(APIView):
 
     @verify_token
     @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter('TOKEN', openapi.IN_HEADER, type=openapi.TYPE_STRING)
+        openapi.Parameter('Authorization', openapi.IN_HEADER, type=openapi.TYPE_STRING)
     ], operation_summary="Update notes",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
