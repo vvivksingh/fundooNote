@@ -1,2 +1,0 @@
-ERROR:root:{'title': [ErrorDetail(string='This field is required.', code='required')], 'description': [ErrorDetail(string='This field is required.', code='required')]}
-WARNING:django.request:Bad Request: /note/notes/
