@@ -21,7 +21,16 @@ class Notes(APIView):
     class based views for crud operation
     """
 
-    @verify_token
+    # @swagger_auto_schema(
+    #     operation_summary="login",
+    #     request_body=openapi.Schema(
+    #         type=openapi.TYPE_OBJECT,
+    #         properties={
+    #             'title': openapi.Schema(type=openapi.TYPE_STRING, description='title'),
+    #             'description': openapi.Schema(type=openapi.TYPE_STRING, description='description'),
+    #         }
+    #     ))
+
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('TOKEN', openapi.IN_HEADER, type=openapi.TYPE_STRING)
     ], operation_summary="Add notes",
@@ -31,7 +40,10 @@ class Notes(APIView):
                 'title': openapi.Schema(type=openapi.TYPE_STRING, description="title"),
                 'description': openapi.Schema(type=openapi.TYPE_STRING, description="description")
             }
-        ))
+        )
+
+    )
+    @verify_token
     def post(self, request):
 
         """
@@ -55,10 +67,11 @@ class Notes(APIView):
             logging.error(e)
             return Response({"message": "validation failed"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @verify_token
+
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('Authorization', openapi.IN_HEADER, type=openapi.TYPE_STRING)
     ], operation_summary="get note by user_id")
+    @verify_token
     def get(self, request):
         """
         this method is created for retrieve data
@@ -93,7 +106,7 @@ class Notes(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-    @verify_token
+
     @swagger_auto_schema(manual_parameters=[
         openapi.Parameter('TOKEN', openapi.IN_HEADER, type=openapi.TYPE_STRING)
     ], operation_summary="Update notes",
@@ -105,6 +118,7 @@ class Notes(APIView):
                 'description': openapi.Schema(type=openapi.TYPE_STRING, description="description")
             }
         ))
+    @verify_token
     def put(self, request):
         """
         To update a previous note
