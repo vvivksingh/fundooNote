@@ -22,9 +22,8 @@ class Notes(APIView):
 
     """
 
-    @verify_token
     @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter('Authorization', openapi.IN_HEADER, type=openapi.TYPE_STRING)
+        openapi.Parameter('TOKEN', openapi.IN_HEADER, type=openapi.TYPE_STRING)
     ], operation_summary="Add notes",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -33,6 +32,7 @@ class Notes(APIView):
                 'description': openapi.Schema(type=openapi.TYPE_STRING, description="description")
             }
         ))
+    @verify_token
     def post(self, request):
 
         """
@@ -89,9 +89,9 @@ class Notes(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-    @verify_token
+
     @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter('Authorization', openapi.IN_HEADER, type=openapi.TYPE_STRING)
+        openapi.Parameter('TOKEN', openapi.IN_HEADER, type=openapi.TYPE_STRING)
     ], operation_summary="Update notes",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -101,6 +101,7 @@ class Notes(APIView):
                 'description': openapi.Schema(type=openapi.TYPE_STRING, description="description")
             }
         ))
+    @verify_token
     def put(self, request):
         """
         To update a previous note
