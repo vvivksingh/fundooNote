@@ -38,7 +38,9 @@ class Notes(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 'title': openapi.Schema(type=openapi.TYPE_STRING, description="title"),
-                'description': openapi.Schema(type=openapi.TYPE_STRING, description="description")
+                'description': openapi.Schema(type=openapi.TYPE_STRING, description="description"),
+                'color': openapi.Schema(type=openapi.TYPE_STRING, description="color"),
+                'is_archieved': openapi.Schema(type=openapi.TYPE_BOOLEAN, description="archive"),
             }
         )
 
@@ -51,6 +53,9 @@ class Notes(APIView):
         :param request: format of the request
         :return: Response
         """
+        print("--------------")
+        print(request.data)
+        print(request.user)
         try:
             serializer = NotesSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -64,8 +69,8 @@ class Notes(APIView):
                 },
                 status=status.HTTP_201_CREATED)
         except Exception as e:
-            logging.error(e)
-            return Response({"message": "validation failed"}, status=status.HTTP_400_BAD_REQUEST)
+            logging.exception(e)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
     @swagger_auto_schema(manual_parameters=[
@@ -115,7 +120,10 @@ class Notes(APIView):
             properties={
                 'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="id"),
                 'title': openapi.Schema(type=openapi.TYPE_STRING, description="title"),
-                'description': openapi.Schema(type=openapi.TYPE_STRING, description="description")
+                'description': openapi.Schema(type=openapi.TYPE_STRING, description="description"),
+                'color': openapi.Schema(type=openapi.TYPE_STRING, description="color"),
+                'is_archived': openapi.Schema(type=openapi.TYPE_BOOLEAN, description="archive"),
+
             }
         ))
     @verify_token
@@ -128,7 +136,7 @@ class Notes(APIView):
         try:
             note = Note.objects.get(id=request.data.get("id"))
             serializer = NotesSerializer(note, data=request.data)
-            print(serializer)
+
             serializer.is_valid(raise_exception=True)
             serializer.save()
             RedisCache().update_note(serializer.data)
@@ -172,6 +180,43 @@ class Notes(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
+
+# class ColorUpdate(APIView):
+#     @verify_token
+#     @swagger_auto_schema(manual_parameters=[
+#         openapi.Parameter('Authorization', openapi.IN_HEADER, type=openapi.TYPE_STRING)
+#     ], operation_summary="update note's color", request_body=openapi.Schema(
+#             type=openapi.TYPE_OBJECT,
+#             properties={
+#                 'color': openapi.Schema(type=openapi.TYPE_STRING, description="color"),
+#                 'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="id")
+#             }
+#         ))
+#     def put(self,request, pk):
+#         note = Note.objects.get(pk=pk)
+#         note.color = request.data.get("color")
+#         note.save()
+#         return Response(
+#             {
+#                 "message": "Color Updated"
+#             }
+#         )
+
+
+# class ArchieveUpdate(APIView):
+#     @verify_token
+#     @swagger_auto_schema(manual_parameters=[
+#         openapi.Parameter('Authorization', openapi.IN_HEADER, type=openapi.TYPE_STRING)
+#     ], operation_summary="update archive")
+#     def put(self,request, pk):
+#         note = Note.objects.get(pk=pk)
+#         note.is_archived = True if note.is_archived is True else False
+#         note.save()
+#         return Response(
+#             {
+#                 "message": "Archive Updated"
+#             }
+#         )
 
 class GetSpecific(APIView):
     @verify_token
